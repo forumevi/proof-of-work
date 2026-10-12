@@ -3,8 +3,8 @@ import { useReadContract } from 'wagmi'
 import { Search, ExternalLink, Award, Briefcase, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { arcTestnet } from 'viem/chains'
-import { Amount } from '@/onchain-money'
-import { buildAddressExplorerUrl, getUsdc } from '@/onchain-facts'
+import { formatUsdc } from '@/onchain-money'
+import { buildAddressExplorerUrl } from '@/onchain-facts'
 
 const CONTRACT_ADDRESS = '0x88dc2637d699cd2bcd22fc0a56e2fcb22d1e6084' as `0x${string}`
 const CHAIN_ID = arcTestnet.id
@@ -56,9 +56,7 @@ function AttestationCard({ tokenId }: { tokenId: bigint }) {
   if (!data) return null
 
   const [employer, , claimedUsdcAmount, title, completedAt] = data
-  const usdc = getUsdc(CHAIN_ID)
-  const decimals = usdc?.decimals ?? 6
-  const formatted = Amount.fromRaw(claimedUsdcAmount, decimals).toFixed(2)
+  const formatted = Number(formatUsdc(claimedUsdcAmount)).toFixed(2)
   const date = new Date(Number(completedAt) * 1000).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -120,9 +118,7 @@ export function ProfileView() {
     query: { enabled: searched.length === 42 },
   })
 
-  const usdc = getUsdc(CHAIN_ID)
-  const decimals = usdc?.decimals ?? 6
-  const totalFormatted = totalEarnings != null ? Amount.fromRaw(totalEarnings, decimals).toFixed(2) : '0.00'
+  const totalFormatted = totalEarnings != null ? Number(formatUsdc(totalEarnings)).toFixed(2) : '0.00'
 
   function handleSearch() {
     const trimmed = input.trim()
